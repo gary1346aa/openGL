@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:Skybox/Skybox.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Toon_Shading/Toon_Shading.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Phong_Lighting/Phong_Lighting.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Normal_Mapping/Normal_Mapping.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Cubemap_Environment_Mapping/Cubemap_Environment_Mapping.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Blinn_Phong_Lighting/Blinn_Phong_Lighting.xcodeproj">
+   </FileRef>
+</Workspace>

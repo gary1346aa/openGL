@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:Simple_Tessellation/Simple_Tessellation.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Simple_Tessellation_Geometry/Simple_Tessellation_Geometry.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Single_Point/Single_Point.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Single_Triangle/Single_Triangle.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Single_Triangle_RGB/Single_Triangle_RGB.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Single_Triangle_Sin_Colored/Single_Triangle_Sin_Colored.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Vertex_Attribute_Variable/Vertex_Attribute_Variable.xcodeproj">
+   </FileRef>
+</Workspace>

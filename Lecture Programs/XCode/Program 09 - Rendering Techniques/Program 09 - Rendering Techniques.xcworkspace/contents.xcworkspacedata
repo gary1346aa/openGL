@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:Deferred_Shading/Deferred_Shading.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Julia_Fractal/Julia_Fractal.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:SSAO/SSAO.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Shadow_Mapping/Shadow_Mapping.xcodeproj">
+   </FileRef>
+</Workspace>
