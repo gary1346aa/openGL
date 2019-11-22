@@ -1,0 +1,11 @@
+
+*.ipch
+*.exe
+*.db-wal
+*.db-shm
+*.opendb
+*.db
+*.log
+Lecture Programs/VC10/Program 01 - OpenGL Rendering Pipeline/Release/Single_Triangle.exe
+Lecture Programs/VC10/Program 01 - OpenGL Rendering Pipeline/Release/Single_Triangle.exe
+Lecture Programs/VC10/Program 01 - OpenGL Rendering Pipeline/.vs/Program 01 - OpenGL Rendering Pipeline/v15/.suo
