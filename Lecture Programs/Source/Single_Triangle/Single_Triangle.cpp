@@ -50,7 +50,7 @@ typedef struct object {
 	int faceCount, vertexCount;
 }object;
 
-int draw_faceidx[999] = {};
+int *draw_faceidx;
 int draw_count = 0;
 
 object* parser(char* filename) {
@@ -223,7 +223,7 @@ void My_Display()
 	//float currentTime = glutGet(GLUT_ELAPSED_TIME);
 	model_matrix = (rot) ? translate(mat4(), vec3(0.1f, -0.5f, 0.0f))*
 							rotate(mat4(), radians((mousePos.dx + mousePos.rx)* 0.5f), vec3(0, 1, 0))*
-							scale(mat4(), vec3(6.0)): model_matrix;
+							scale(mat4(), vec3(5.0)): model_matrix;
 
 	view_matrix = lookAt(vec3(0.0f, 0.5f, 0.8f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
@@ -234,16 +234,16 @@ void My_Display()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glLineWidth(1.5f);
 	glUniform4fv(uniforms.render.color, 1, black);
-	glDrawElements(GL_PATCHES, 3, GL_UNSIGNED_INT, bunny->face);
+	glDrawElements(GL_PATCHES, 3 * bunny->faceCount, GL_UNSIGNED_INT, bunny->face);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glUniform4fv(uniforms.render.color, 1, grey);
-	glDrawElements(GL_PATCHES, 3, GL_UNSIGNED_INT, bunny->face);
+	glDrawElements(GL_PATCHES, 3 * bunny->faceCount, GL_UNSIGNED_INT, bunny->face);
 
 
-	if (draw_count)
+	if (draw_count > 0)
 	{
 		glUniform4fv(uniforms.render.color, 1, green);
-		glDrawElements(GL_PATCHES, 3 * draw_count, GL_UNSIGNED_INT, draw_faceidx);
+		glDrawElements(GL_PATCHES, 3*draw_count, GL_UNSIGNED_INT, draw_faceidx);
 	}
 
 	glutSwapBuffers();
@@ -252,8 +252,10 @@ void My_Display()
 
 void My_RayCasting() 
 {
+	if (draw_faceidx == nullptr)
+		draw_faceidx = (int*)malloc(999 * sizeof(int));
 	vector<pair<double, int>> hit;
-	for (int i = 0; i < 1; ++i)
+	for (int i = 0; i < bunny->faceCount; ++i)
 	{
 
 		vec4 a = mvp_matrix * vec4(	(float)bunny->vertex[3 * bunny->face[3*i  ]  ], 
@@ -262,36 +264,39 @@ void My_RayCasting()
 
 		vec4 b = mvp_matrix * vec4(	(float)bunny->vertex[3 * bunny->face[3*i+1]  ],
 									(float)bunny->vertex[3 * bunny->face[3*i+1]+1],
-									(float)bunny->vertex[3 * bunny->face[3*i+1]+2], 1.0f);
+									(float)bunny->vertex[3 * bunny->face[3*i+1]+2], 1.0f );
 
 		vec4 c = mvp_matrix * vec4(	(float)bunny->vertex[3 * bunny->face[3*i+2]  ], 
 									(float)bunny->vertex[3 * bunny->face[3*i+2]+1],
 									(float)bunny->vertex[3 * bunny->face[3*i+2]+2], 1.0f );
 
-		float mx = (mousePos.px * 2.0f / (float)viewportSize.width) - 1;
-		float my = 1 - (mousePos.py * 2.0f / (float)viewportSize.height);
+		//float mx = (mousePos.px * 2.0f / (float)viewportSize.width) - 1;
+		//float my = 1 - (mousePos.py * 2.0f / (float)viewportSize.height);
 
-		if (a[3] == 0 || b[3] == 0 || c[3] == 0)
+		if (a.w == 0 || b.w == 0 || c.w == 0)
 			continue;
 
-		a[0] /= a[3]; a[1] /= a[3]; a[2] /= a[3]; a[3] /= a[3];
-		b[0] /= b[3]; b[1] /= b[3]; b[2] /= b[3]; b[3] /= b[3];
-		c[0] /= c[3]; c[1] /= c[3]; c[3] /= c[3]; c[3] /= c[3];
+		a.x /= a.w; a.y /= a.w; a.z /= a.w; a.w /= a.w;
+		b.x /= b.w; b.y /= b.w; b.z /= b.w; b.w /= b.w;
+		c.x /= c.w; c.y /= c.w; c.z /= c.w; c.w /= c.w;
 
-		printf("m: %f %f\n", mx, my);
-		printf("a: %f %f\n", a[0], a[1]);
-		printf("b: %f %f\n", b[0], b[1]);
-		printf("c: %f %f\n", c[0], c[1]);
+		//printf("m: %f %f\n", mx, my);
+		//printf("a: %f %f\n", a[0], a[1]);
+		//printf("b: %f %f\n", b[0], b[1]);
+		//printf("c: %f %f\n", c[0], c[1]);
 
 		//printf("a : %f %f\n", (a[0] + 1) * viewportSize.width / 2.0f, (1 - a[1]) * viewportSize.height / 2.0f);
 		//printf("b : %f %f\n", (b[0] + 1) * viewportSize.width / 2.0f, (1 - b[1]) * viewportSize.height / 2.0f);
 		//printf("c : %f %f\n", (c[0] + 1) * viewportSize.width / 2.0f, (1 - c[1]) * viewportSize.height / 2.0f);
 
-		vec4 p = { mx, my, 0, 1 };
+		vec2 a2 = { (a.x + 1) * viewportSize.width / 2.0f, (1 - a.y) * viewportSize.height / 2.0f };
+		vec2 b2 = { (b.x + 1) * viewportSize.width / 2.0f, (1 - b.y) * viewportSize.height / 2.0f };
+		vec2 c2 = { (c.x + 1) * viewportSize.width / 2.0f, (1 - c.y) * viewportSize.height / 2.0f };
+		vec2 p2 = { float(mousePos.px), float(mousePos.py) };
 
-		vec4 v0 = c - a;
-		vec4 v1 = b - a;
-		vec4 v2 = p - a;
+		vec2 v0 = c2 - a2;
+		vec2 v1 = b2 - a2;
+		vec2 v2 = p2 - a2;
 		
 		float dot00 = dot(v0, v0);
 		float dot01 = dot(v0, v1);
@@ -300,45 +305,34 @@ void My_RayCasting()
 		float dot12 = dot(v1, v2);
 
 		float det = (dot00 * dot11 - dot01 * dot01);
-		//if (det < 1e-6 && det > -1e-6)
-		//	continue;
+		if (det < 1e-6 && det > -1e-6)
+			continue;
 		
-		vec2 a2 = { (a[0] + 1) * viewportSize.width / 2.0f , (1 - a[1]) * viewportSize.height / 2.0f };
-		vec2 b2 = { (b[0] + 1) * viewportSize.width / 2.0f, (1 - b[1]) * viewportSize.height / 2.0f };
-		vec2 c2 = { (c[0] + 1) * viewportSize.width / 2.0f, (1 - c[1]) * viewportSize.height / 2.0f };
+		//printf("a: %f %f\n", a2[0], a2[1]);
+		//printf("b: %f %f\n", b2[0], b2[1]);
+		//printf("c: %f %f\n", c2[0], c2[1]);
 
-		vec2 v20 = c2 - a2;
-		vec2 v21 = b2 - a2;
-		vec2 tmp = { mousePos.x, mousePos.y };
-		vec2 v22 = tmp - a2;
-
-		printf("a: %f %f\n", a2[0], a2[1]);
-		printf("b: %f %f\n", b2[0], b2[1]);
-		printf("c: %f %f\n", c2[0], c2[1]);
-
-		printf("dot: %f %f\n", dot(v21, v22)/(v21[0]*v21[0] + v21[1]*v21[1]), dot(v20, v22));
+		// printf("dot: u : %f \n", dot(v1, v2)/(v1[0]*v1[0] + v1[1]*v1[1]));
 
 		double invDenom = 1.0f / det;
 		double u = (dot11 * dot02 - dot01 * dot12) * invDenom;
 		double v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
-		printf("u : %f, v = %f", u, v);
+		// printf("barycentric u : %f, v = %f\n", u, v);
 
 		if ((u >= 0) && (v >= 0) && (u + v < 1))
 		{
 			hit.push_back({ a[2] + u * (b[2] - a[2]) + v * (c[2] - a[2]), i });
-			printf("hit!\n");
+			printf("hit! %d\n", i);
 		}
-			
-	
 	}
 	if (hit.size())
 	{
 		sort(hit.begin(), hit.end());
 		printf("hit face id: %d\n", hit[0].second);
-		draw_faceidx[draw_count * 3]     = 3 * bunny->face[3 * hit[0].second];
-		draw_faceidx[draw_count * 3 + 1] = 3 * bunny->face[3 * hit[0].second + 1];
-		draw_faceidx[draw_count * 3 + 2] = 3 * bunny->face[3 * hit[0].second + 2];
+		draw_faceidx[3*draw_count  ] = bunny->face[3 * hit[0].second    ];
+		draw_faceidx[3*draw_count+1] = bunny->face[3 * hit[0].second + 1];
+		draw_faceidx[3*draw_count+2] = bunny->face[3 * hit[0].second + 2];
 		draw_count++;
 	}
 
