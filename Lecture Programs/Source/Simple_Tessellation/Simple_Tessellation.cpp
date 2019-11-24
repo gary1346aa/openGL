@@ -20,6 +20,7 @@ static const char * tcs_source[] =
 	"                                                                                  \n"
 	"layout (vertices = 3) out;                                                        \n"
 	"                                                                                  \n"
+	//"out vec4 tes_color;                                                               \n"
 	"void main(void)                                                                   \n"
 	"{                                                                                 \n"
 	"    if (gl_InvocationID == 0)                                                     \n"
@@ -30,6 +31,7 @@ static const char * tcs_source[] =
 	"        gl_TessLevelOuter[2] = 5.0;                                               \n"
 	"    }                                                                             \n"
 	"    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;     \n"
+	//"    tcs_color = vec4(0.0, 0.0, 0.0, 1.0);                                         \n"
 	"}                                                                                 \n"
 };
 
@@ -39,11 +41,13 @@ static const char * tes_source[] =
 	"                                                                                  \n"
 	"layout (triangles, equal_spacing, cw) in;                                         \n"
 	"                                                                                  \n"
+	"out vec4 tes_color;                                                               \n"
 	"void main(void)                                                                   \n"
 	"{                                                                                 \n"
 	"    gl_Position = (gl_TessCoord.x * gl_in[0].gl_Position) +                       \n"
 	"                  (gl_TessCoord.y * gl_in[1].gl_Position) +                       \n"
 	"                  (gl_TessCoord.z * gl_in[2].gl_Position);                        \n"
+	"    tes_color = vec4(1.0f, 0.0, 0.0, 1.0);										   \n"
 	"}                                                                                 \n"
 };
 
@@ -52,10 +56,11 @@ static const char * fs_source[] =
 	"#version 410 core                                                 \n"
 	"                                                                  \n"
 	"out vec4 color;                                                   \n"
+	"in vec4 tes_color;												   \n"
 	"                                                                  \n"
 	"void main(void)                                                   \n"
 	"{                                                                 \n"
-	"    color = vec4(1.0, 0.0, 0.0, 1.0);                             \n"
+	"    color = tes_color;                                            \n"
 	"}                                                                 \n"
 };
 
@@ -103,6 +108,7 @@ void My_Display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(program);
+	glLineWidth(3.0f);
 	glDrawArrays(GL_PATCHES, 0, 3);
 	glutSwapBuffers();
 }
