@@ -1,26 +1,26 @@
-﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(391,5): warning MSB8028: The intermediate directory (Release\) contains files shared from another project (Simple_Tessellation.vcxproj, Simple_Tessellation_Geometry.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(391,5): warning MSB8028: The intermediate directory (Release\) contains files shared from another project (Simple_Tessellation.vcxproj, Single_Point.vcxproj).  This can lead to incorrect clean and rebuild behavior.
   Single_Triangle.cpp
-c:\users\黃琮耀\documents\github\opengl\lecture programs\include\tiny_obj_loader.h(1092): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\gary1\documents\github\opengl\lecture programs\include\tiny_obj_loader.h(1092): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(2263): note: see declaration of 'sscanf'
-c:\users\黃琮耀\documents\github\opengl\lecture programs\include\tiny_obj_loader.h(1116): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\gary1\documents\github\opengl\lecture programs\include\tiny_obj_loader.h(1116): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(2263): note: see declaration of 'sscanf'
-c:\users\黃琮耀\documents\github\opengl\lecture programs\include\common.h(164): warning C4018: '<': signed/unsigned mismatch
-c:\users\黃琮耀\documents\github\opengl\lecture programs\include\common.h(166): warning C4018: '<': signed/unsigned mismatch
-c:\users\黃琮耀\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(59): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\gary1\documents\github\opengl\lecture programs\include\common.h(164): warning C4018: '<': signed/unsigned mismatch
+c:\users\gary1\documents\github\opengl\lecture programs\include\common.h(166): warning C4018: '<': signed/unsigned mismatch
+c:\users\gary1\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(59): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(208): note: see declaration of 'fopen'
-c:\users\黃琮耀\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(64): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\gary1\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(64): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(1197): note: see declaration of 'fscanf'
-c:\users\黃琮耀\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(73): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\gary1\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(73): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(1197): note: see declaration of 'fscanf'
-c:\users\黃琮耀\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(78): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\gary1\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(78): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(1197): note: see declaration of 'fscanf'
-c:\users\黃琮耀\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(271): warning C4838: conversion from 'int' to 'GLfloat' requires a narrowing conversion
-c:\users\黃琮耀\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(271): warning C4244: 'initializing': conversion from 'int' to 'GLfloat', possible loss of data
-c:\users\黃琮耀\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(437): warning C4996: 'chdir': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _chdir. See online help for details.
+c:\users\gary1\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(268): warning C4838: conversion from 'int' to 'GLfloat' requires a narrowing conversion
+c:\users\gary1\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(268): warning C4244: 'initializing': conversion from 'int' to 'GLfloat', possible loss of data
+c:\users\gary1\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(428): warning C4996: 'chdir': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _chdir. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\direct.h(102): note: see declaration of 'chdir'
   Generating code
-  0 of 733 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+  3 of 619 functions ( 0.5%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+    3 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  Single_Triangle.vcxproj -> C:\Users\黃琮耀\Documents\GitHub\openGL\Lecture Programs\VC10\Program 01 - OpenGL Rendering Pipeline\Release\Single_Triangle.exe
+  Single_Triangle.vcxproj -> C:\Users\gary1\Documents\GitHub\openGL\Lecture Programs\VC10\Program 01 - OpenGL Rendering Pipeline\Release\Single_Triangle.exe

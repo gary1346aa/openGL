@@ -239,9 +239,7 @@ void My_Init()
 	glUseProgram(program);
 
 	uniforms.render.matrix = glGetUniformLocation(program, "mvp_matrix");
-	//uniforms.render.color = glGetUniformLocation(program, "vs_color");
 	uniforms.render.mouse = glGetUniformLocation(program, "mouse");
-	printf("%d\n", uniforms.render.mouse);
 }
 
 // GLUT callback. Called to draw the scene.
@@ -260,29 +258,22 @@ void My_Display()
 
 	glUniformMatrix4fv(uniforms.render.matrix, 1, GL_FALSE, value_ptr(mvp_matrix));
 
-
 	GLfloat grey[] = { 0, 0, 0, -1 };
-	glUniform4fv(uniforms.render.color, 1, grey);
+	glUniform4fv(uniforms.render.mouse, 1, grey);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glLineWidth(1.5f);
 	glDrawElements(GL_PATCHES, 3 * bunny->faceCount, GL_UNSIGNED_INT, bunny->face);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	GLfloat m2[] = { float(mousePos.x), float(mousePos.y), viewportSize.width, viewportSize.height };
-	glUniform4fv(uniforms.render.color, 1, m2);
+	glUniform4fv(uniforms.render.mouse, 1, m2);
 	glDrawElements(GL_PATCHES, 3 * bunny->faceCount, GL_UNSIGNED_INT, bunny->face);
 	
-
-	if (draw_count > 0)
-	{
-		//glUniform4fv(uniforms.render.color, 1, green);
-		glDrawElements(GL_PATCHES, 3*draw_count, GL_UNSIGNED_INT, draw_faceidx);
-	}
 
 	glutSwapBuffers();
 }
 
-
+/*
 void My_RayCasting() 
 {
 	if (draw_faceidx == nullptr)
@@ -369,7 +360,7 @@ void My_RayCasting()
 		draw_count++;
 	}
 
-}
+}*/
 
 void My_Reshape(int width, int height)
 {
@@ -395,7 +386,7 @@ void My_Mouse(int button, int state, int x, int y)
 			mousePos.px = x;
 			mousePos.py = y;
 			printf("Mouse Pressed: x = %d, y = %d\n", x, y);
-			My_RayCasting();
+			//My_RayCasting();
 		}
 		break;
 	case GLUT_LEFT_BUTTON:
