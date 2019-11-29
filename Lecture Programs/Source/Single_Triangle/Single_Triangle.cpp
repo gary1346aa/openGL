@@ -68,7 +68,7 @@ object* parser(char* filename) {
 		obj->vertexCount = vertexCount;
 		obj->faceCount = faceCount;
 		printf("vertexCount = %d, faceCount = %d\n", vertexCount, faceCount);
-		
+
 		for (int i = 0; i < vertexCount; ++i)
 			fscanf(fp, "%*c %e %e %e %*c", &obj->vertex[3 * i], &obj->vertex[3 * i + 1], &obj->vertex[3 * i + 2]);
 
@@ -89,7 +89,7 @@ object *bunny;
 
 static const char * vs_source[] =
 {
-	"#version 410 core						  \n"		
+	"#version 410 core						  \n"
 	"layout(location = 0) in vec4 vPosition;  \n"
 	"uniform mat4 mvp_matrix;   			  \n"
 	"void main()                              \n"
@@ -137,7 +137,7 @@ const char *gs_source[] =
 {
 	"#version 410 core                                                                      \n"
 	"                                                                                       \n"
-	"layout(triangles, invocations = 16) in;                                                \n"
+	"layout(triangles, invocations = 1) in;                                                \n"
 	"layout(triangle_strip, max_vertices = 3) out;                                          \n"
 	"                                                                                       \n"
 	"out vec4 gs_color;                                                                     \n"
@@ -230,29 +230,28 @@ void My_Init()
 	glAttachShader(program, vs);
 	glAttachShader(program, tcs);
 	glAttachShader(program, tes);
-	glAttachShader(program, fs);
 	glAttachShader(program, gs);
+	glAttachShader(program, fs);
+
 
 	glLinkProgram(program);
- 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, bunny->vertex);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, bunny->vertex);
 	glEnableVertexAttribArray(0);
 	glUseProgram(program);
 
 	uniforms.render.matrix = glGetUniformLocation(program, "mvp_matrix");
-	//uniforms.render.color = glGetUniformLocation(program, "vs_color");
 	uniforms.render.mouse = glGetUniformLocation(program, "mouse");
-	printf("%d\n", uniforms.render.mouse);
 }
 
 // GLUT callback. Called to draw the scene.
 void My_Display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 	//float currentTime = glutGet(GLUT_ELAPSED_TIME);
 	model_matrix = (rot) ? translate(mat4(), vec3(0.1f, -0.5f, 0.0f))*
-							rotate(mat4(), radians((mousePos.dx + mousePos.rx)* 0.5f), vec3(0, 1, 0))*
-							scale(mat4(), vec3(5.0)): model_matrix;
+		rotate(mat4(), radians((mousePos.dx + mousePos.rx)* 0.5f), vec3(0, 1, 0))*
+		scale(mat4(), vec3(5.0)) : model_matrix;
 
 	view_matrix = lookAt(vec3(0.0f, 0.5f, 0.8f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
@@ -260,30 +259,22 @@ void My_Display()
 
 	glUniformMatrix4fv(uniforms.render.matrix, 1, GL_FALSE, value_ptr(mvp_matrix));
 
-
 	GLfloat grey[] = { 0, 0, 0, -1 };
-	glUniform4fv(uniforms.render.color, 1, grey);
+	glUniform4fv(uniforms.render.mouse, 1, grey);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glLineWidth(1.5f);
 	glDrawElements(GL_PATCHES, 3 * bunny->faceCount, GL_UNSIGNED_INT, bunny->face);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	GLfloat m2[] = { float(mousePos.x), float(mousePos.y), viewportSize.width, viewportSize.height };
-	glUniform4fv(uniforms.render.color, 1, m2);
+	glUniform4fv(uniforms.render.mouse, 1, m2);
 	glDrawElements(GL_PATCHES, 3 * bunny->faceCount, GL_UNSIGNED_INT, bunny->face);
-	
-
-	if (draw_count > 0)
-	{
-		//glUniform4fv(uniforms.render.color, 1, green);
-		glDrawElements(GL_PATCHES, 3*draw_count, GL_UNSIGNED_INT, draw_faceidx);
-	}
 
 	glutSwapBuffers();
 }
 
-
-void My_RayCasting() 
+/*
+void My_RayCasting()
 {
 	if (draw_faceidx == nullptr)
 		draw_faceidx = (int*)malloc(999 * sizeof(int));
@@ -291,17 +282,17 @@ void My_RayCasting()
 	for (int i = 0; i < bunny->faceCount; ++i)
 	{
 
-		vec4 a = mvp_matrix * vec4(	(float)bunny->vertex[3 * bunny->face[3*i  ]  ], 
-									(float)bunny->vertex[3 * bunny->face[3*i  ]+1],
-									(float)bunny->vertex[3 * bunny->face[3*i  ]+2], 1.0f );
+		vec4 a = mvp_matrix * vec4((float)bunny->vertex[3 * bunny->face[3 * i]],
+			(float)bunny->vertex[3 * bunny->face[3 * i] + 1],
+			(float)bunny->vertex[3 * bunny->face[3 * i] + 2], 1.0f);
 
-		vec4 b = mvp_matrix * vec4(	(float)bunny->vertex[3 * bunny->face[3*i+1]  ],
-									(float)bunny->vertex[3 * bunny->face[3*i+1]+1],
-									(float)bunny->vertex[3 * bunny->face[3*i+1]+2], 1.0f );
+		vec4 b = mvp_matrix * vec4((float)bunny->vertex[3 * bunny->face[3 * i + 1]],
+			(float)bunny->vertex[3 * bunny->face[3 * i + 1] + 1],
+			(float)bunny->vertex[3 * bunny->face[3 * i + 1] + 2], 1.0f);
 
-		vec4 c = mvp_matrix * vec4(	(float)bunny->vertex[3 * bunny->face[3*i+2]  ], 
-									(float)bunny->vertex[3 * bunny->face[3*i+2]+1],
-									(float)bunny->vertex[3 * bunny->face[3*i+2]+2], 1.0f );
+		vec4 c = mvp_matrix * vec4((float)bunny->vertex[3 * bunny->face[3 * i + 2]],
+			(float)bunny->vertex[3 * bunny->face[3 * i + 2] + 1],
+			(float)bunny->vertex[3 * bunny->face[3 * i + 2] + 2], 1.0f);
 
 		//float mx = (mousePos.px * 2.0f / (float)viewportSize.width) - 1;
 		//float my = 1 - (mousePos.py * 2.0f / (float)viewportSize.height);
@@ -330,7 +321,7 @@ void My_RayCasting()
 		vec2 v0 = c2 - a2;
 		vec2 v1 = b2 - a2;
 		vec2 v2 = p2 - a2;
-		
+
 		float dot00 = dot(v0, v0);
 		float dot01 = dot(v0, v1);
 		float dot02 = dot(v0, v2);
@@ -340,7 +331,7 @@ void My_RayCasting()
 		float det = (dot00 * dot11 - dot01 * dot01);
 		if (det < 1e-6 && det > -1e-6)
 			continue;
-		
+
 		//printf("a: %f %f\n", a2[0], a2[1]);
 		//printf("b: %f %f\n", b2[0], b2[1]);
 		//printf("c: %f %f\n", c2[0], c2[1]);
@@ -363,13 +354,13 @@ void My_RayCasting()
 	{
 		sort(hit.begin(), hit.end());
 		printf("hit face id: %d\n", hit[0].second);
-		draw_faceidx[3*draw_count  ] = bunny->face[3 * hit[0].second    ];
-		draw_faceidx[3*draw_count+1] = bunny->face[3 * hit[0].second + 1];
-		draw_faceidx[3*draw_count+2] = bunny->face[3 * hit[0].second + 2];
+		draw_faceidx[3 * draw_count] = bunny->face[3 * hit[0].second];
+		draw_faceidx[3 * draw_count + 1] = bunny->face[3 * hit[0].second + 1];
+		draw_faceidx[3 * draw_count + 2] = bunny->face[3 * hit[0].second + 2];
 		draw_count++;
 	}
 
-}
+}*/
 
 void My_Reshape(int width, int height)
 {
@@ -395,7 +386,7 @@ void My_Mouse(int button, int state, int x, int y)
 			mousePos.px = x;
 			mousePos.py = y;
 			printf("Mouse Pressed: x = %d, y = %d\n", x, y);
-			My_RayCasting();
+			//My_RayCasting();
 		}
 		break;
 	case GLUT_LEFT_BUTTON:
@@ -423,25 +414,25 @@ void My_Motion(int x, int y)
 {
 	mousePos.x = x;
 	mousePos.y = y;
-	if(rot)
+	if (rot)
 	{
 		mousePos.dx = x - mousePos.px;
-		mousePos.dy = y - mousePos.py; 
+		mousePos.dy = y - mousePos.py;
 	}
 	//printf("Mouse Position: x = %d, y = %d\n", x, y);
 }
 
 int main(int argc, char *argv[])
 {
-    // Change working directory to source code path
-    chdir(__FILEPATH__);
+	// Change working directory to source code path
+	chdir(__FILEPATH__);
 	// Initialize GLUT and GLEW, then create a window.
 	////////////////////
 	glutInit(&argc, argv);
 #ifdef _MSC_VER
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 #else
-    glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 #endif
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(600, 600);
