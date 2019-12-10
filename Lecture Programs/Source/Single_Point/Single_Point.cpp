@@ -18,6 +18,8 @@ vector<tinyobj::material_t> materials;
 
 GLuint *position_buffer;
 GLuint *index_buffer;
+GLuint *texcoord_buffer;
+map<string, GLuint> textures;
 
 struct
 {
@@ -28,14 +30,12 @@ struct
 	} render;
 } uniforms;
 
-
 struct
 {
-	GLfloat x = 4000.0f;
-	GLfloat y = 0.0f;
-	GLfloat z = 0.0f;
-} camera;
-
+	GLfloat rho = 5000;
+	GLfloat phi = deg2rad(90);
+	GLfloat theta = 0;
+} spherical;
 
 struct
 {
@@ -150,11 +150,14 @@ void My_Init()
 	// ----- Begin Initialize Input Mesh -----
 
 	string err;
-	tinyobj::LoadObj(shapes, materials, err, "../../Media/Objects/sponza.obj");
+	string obj_dir = "../../Media/Objects/sponza.obj";
+	string base_dir = "../../Media/Objects/";
+	tinyobj::LoadObj(shapes, materials, err, "../../Media/Objects/sponza.obj", "../../Media/Objects/");
 
 	vao = (GLuint*)malloc(shapes.size() * sizeof(GLuint));
 	position_buffer = (GLuint*)malloc(shapes.size() * sizeof(GLuint));
 	index_buffer = (GLuint*)malloc(shapes.size() * sizeof(GLuint));
+	texcoord_buffer = (GLuint*)malloc(shapes.size() * sizeof(GLuint));
 
 	for (int i = 0; i < shapes.size(); i++) {
 		glGenBuffers(1, &position_buffer[i]);
@@ -163,6 +166,55 @@ void My_Init()
 		glGenBuffers(1, &index_buffer[i]);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer[i]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, shapes[i].mesh.indices.size() * sizeof(unsigned int), shapes[i].mesh.indices.data(), GL_STATIC_DRAW);
+		glGenBuffers(1, &texcoord_buffer[i]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, texcoord_buffer[i]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, shapes[i].mesh.texcoords.size() * sizeof(unsigned int), shapes[i].mesh.texcoords.data(), GL_STATIC_DRAW);
+	}
+	
+	{
+		for (size_t m = 0; m < materials.size(); m++) {
+			tinyobj::material_t* mp = &materials[m];
+
+			if (mp->diffuse_texname.length() > 0) {
+				// Only load the texture if it is not already loaded
+				if (textures.find(mp->diffuse_texname) == textures.end()) {
+					GLuint texture_id;
+					int w, h;
+					int comp;
+
+					std::string texture_filename = base_dir + mp->diffuse_texname;
+
+					unsigned char* image =
+						stbi_load(texture_filename.c_str(), &w, &h, &comp, STBI_default);
+					if (!image) {
+						std::cerr << "Unable to load texture: " << texture_filename
+							<< std::endl;
+						exit(1);
+					}
+					std::cout << m << " Loaded texture: " << texture_filename << ", w = " << w
+						<< ", h = " << h << ", comp = " << comp << std::endl;
+
+					glGenTextures(1, &texture_id);
+					glBindTexture(GL_TEXTURE_2D, texture_id);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+					if (comp == 3) {
+						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB,
+							GL_UNSIGNED_BYTE, image);
+					}
+					else if (comp == 4) {
+						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+							GL_UNSIGNED_BYTE, image);
+					}
+					else {
+						assert(0);  // TODO
+					}
+					glBindTexture(GL_TEXTURE_2D, 0);
+					stbi_image_free(image);
+					textures.insert(std::make_pair(mp->diffuse_texname, texture_id));
+				}
+			}
+		}
 	}
 
 	for (int i = 0; i < shapes.size(); i++)
@@ -190,14 +242,24 @@ void My_Display()
 	glClearBufferfv(GL_COLOR, 0, white);
 	glClearBufferfv(GL_DEPTH, 0, ones);
 	glUseProgram(render_prog);
+	glActiveTexture(GL_TEXTURE0);
+
 	glFrontFace(GL_CW);
 	glEnable(GL_DEPTH_TEST || GL_CULL_FACE);
 
-	view_matrix = lookAt(vec3(camera.x, camera.y, camera.z), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+
+	view_matrix = lookAt(vec3(	spherical.rho*sin(spherical.phi)*cos(spherical.theta), 
+								spherical.rho*cos(spherical.phi),
+								spherical.rho*sin(spherical.phi)*sin(spherical.theta)), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	
+
+	
+
+	//view_matrix = lookAt(vec3(camera.x, camera.y, camera.z), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	mvp_matrix = proj_matrix * view_matrix;
 	glUniformMatrix4fv(uniforms.render.mvp_matrix, 1, GL_FALSE, &mvp_matrix[0][0]);
 	
-	glLineWidth(3.0f);
+	glLineWidth(1.5f);
 
 	for (int i = 0; i < shapes.size(); i++)
 	{
@@ -205,13 +267,20 @@ void My_Display()
 
 		glUniform4fv(uniforms.render.color, 1, black);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindVertexArray(vao[i]);
+		for (int j = 0; j < shapes[i].mesh.material_ids.size(); j++)
+		{
+			glBindTexture(GL_TEXTURE_2D, textures[materials[shapes[i].mesh.material_ids[j]].diffuse_texname]);
+		}
 		glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
-		
+		glBindTexture(GL_TEXTURE_2D, 0);
+		/*
 		glUniform4fv(uniforms.render.color, 1, grey);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glBindVertexArray(vao[i]);
 		glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
+		*/
 	}
 	// ----- End Render Pass -----
 
@@ -258,11 +327,11 @@ void My_Wheel(int button, int dir, int x, int y)
 {
 	if (dir > 0)
 	{
-		camera.x -= 100;
+		spherical.rho = (spherical.rho - 150 > 100)? spherical.rho - 150 : 100;
 	}
 	else
 	{
-		camera.x += 100;
+		spherical.rho += 150;
 	}
 }
 
@@ -270,12 +339,17 @@ void My_Motion(int x, int y)
 {
 	mouse.position.x = x;
 	mouse.position.y = y;
-	if(mouse.pressed)
+	if (mouse.pressed)
 	{
 		mouse.diff.x = x - mouse.press.x;
 		mouse.diff.y = y - mouse.press.y;
-		camera.z = 10.0f*(mouse.release.x + mouse.diff.x);
-		camera.y = 10.0f*(mouse.release.y + mouse.diff.y);
+		if ((mouse.release.y + mouse.diff.y) <= -90)
+			spherical.phi = deg2rad(180);
+		else if ((mouse.release.y + mouse.diff.y) >= 90)
+			spherical.phi = 0.1;
+		else
+			spherical.phi = deg2rad(90 - mouse.release.y - mouse.diff.y);
+		spherical.theta = deg2rad(mouse.release.x + mouse.diff.x);
 	}
 }
 

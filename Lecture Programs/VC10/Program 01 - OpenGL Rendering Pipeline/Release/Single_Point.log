@@ -1,19 +1,21 @@
-﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(391,5): warning MSB8028: The intermediate directory (Release\) contains files shared from another project (Simple_Tessellation.vcxproj, Single_Triangle.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(391,5): warning MSB8028: The intermediate directory (Release\) contains files shared from another project (Single_Triangle.vcxproj).  This can lead to incorrect clean and rebuild behavior.
   Single_Point.cpp
-c:\users\gary1\documents\github\opengl\lecture programs\include\tiny_obj_loader.h(1092): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\gary huang\documents\github\opengl\lecture programs\include\tiny_obj_loader.h(1092): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(2263): note: see declaration of 'sscanf'
-c:\users\gary1\documents\github\opengl\lecture programs\include\tiny_obj_loader.h(1116): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\gary huang\documents\github\opengl\lecture programs\include\tiny_obj_loader.h(1116): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(2263): note: see declaration of 'sscanf'
-c:\users\gary1\documents\github\opengl\lecture programs\include\common.h(164): warning C4018: '<': signed/unsigned mismatch
-c:\users\gary1\documents\github\opengl\lecture programs\include\common.h(166): warning C4018: '<': signed/unsigned mismatch
-c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(159): warning C4018: '<': signed/unsigned mismatch
-c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(168): warning C4018: '<': signed/unsigned mismatch
-c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(202): warning C4018: '<': signed/unsigned mismatch
-c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(285): warning C4996: 'chdir': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _chdir. See online help for details.
+c:\users\gary huang\documents\github\opengl\lecture programs\include\common.h(164): warning C4018: '<': signed/unsigned mismatch
+c:\users\gary huang\documents\github\opengl\lecture programs\include\common.h(166): warning C4018: '<': signed/unsigned mismatch
+c:\users\gary huang\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(162): warning C4018: '<': signed/unsigned mismatch
+c:\users\gary huang\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(220): warning C4018: '<': signed/unsigned mismatch
+c:\users\gary huang\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(264): warning C4018: '<': signed/unsigned mismatch
+c:\users\gary huang\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(272): warning C4018: '<': signed/unsigned mismatch
+c:\users\gary huang\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(349): warning C4305: '=': truncation from 'double' to 'GLfloat'
+c:\users\gary huang\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(359): warning C4996: 'chdir': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _chdir. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\direct.h(102): note: see declaration of 'chdir'
   Generating code
-  3 of 1566 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+  2 of 1826 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    2 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  Single_Point.vcxproj -> C:\Users\gary1\Documents\GitHub\openGL\Lecture Programs\VC10\Program 01 - OpenGL Rendering Pipeline\Release\Single_Point.exe
+  Single_Point.vcxproj -> C:\Users\Gary Huang\Documents\GitHub\openGL\Lecture Programs\VC10\Program 01 - OpenGL Rendering Pipeline\Release\Single_Point.exe
