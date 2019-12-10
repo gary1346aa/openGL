@@ -19,8 +19,8 @@ c:\users\gary1\documents\github\opengl\lecture programs\source\single_triangle\s
 c:\users\gary1\documents\github\opengl\lecture programs\source\single_triangle\single_triangle.cpp(428): warning C4996: 'chdir': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _chdir. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\direct.h(102): note: see declaration of 'chdir'
   Generating code
-  3 of 619 functions ( 0.5%) were compiled, the rest were copied from previous compilation.
+  0 of 619 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    3 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   Single_Triangle.vcxproj -> C:\Users\gary1\Documents\GitHub\openGL\Lecture Programs\VC10\Program 01 - OpenGL Rendering Pipeline\Release\Single_Triangle.exe

@@ -11,16 +11,13 @@ GLuint *vao;
 size_t index_count;
 
 mat4 proj_matrix;
-mat4 model_matrix;
 mat4 view_matrix;
 mat4 mvp_matrix;
 vector<tinyobj::shape_t> shapes;
 vector<tinyobj::material_t> materials;
-GLfloat Scale = 0.001f;
 
-GLuint position_buffer;
-GLuint normal_buffer;
-GLuint index_buffer;
+GLuint *position_buffer;
+GLuint *index_buffer;
 
 struct
 {
@@ -30,6 +27,42 @@ struct
 		GLint mvp_matrix;
 	} render;
 } uniforms;
+
+
+struct
+{
+	GLfloat x = 4000.0f;
+	GLfloat y = 0.0f;
+	GLfloat z = 0.0f;
+} camera;
+
+
+struct
+{
+	struct
+	{
+		GLint x;
+		GLint y;
+	} position;
+	struct
+	{
+		GLint x;
+		GLint y;
+	} press;
+	struct
+	{
+		GLint x = 0;
+		GLint y = 0;
+	} release;
+	struct
+	{
+		GLint x;
+		GLint y;
+	} diff;
+	bool pressed = false;
+} mouse;
+
+
 
 const char *render_fs[] =
 {
@@ -120,32 +153,31 @@ void My_Init()
 	tinyobj::LoadObj(shapes, materials, err, "../../Media/Objects/sponza.obj");
 
 	vao = (GLuint*)malloc(shapes.size() * sizeof(GLuint));
+	position_buffer = (GLuint*)malloc(shapes.size() * sizeof(GLuint));
+	index_buffer = (GLuint*)malloc(shapes.size() * sizeof(GLuint));
+
+	for (int i = 0; i < shapes.size(); i++) {
+		glGenBuffers(1, &position_buffer[i]);
+		glBindBuffer(GL_ARRAY_BUFFER, position_buffer[i]);
+		glBufferData(GL_ARRAY_BUFFER, shapes[i].mesh.positions.size() * sizeof(float), shapes[i].mesh.positions.data(), GL_STATIC_DRAW);
+		glGenBuffers(1, &index_buffer[i]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer[i]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, shapes[i].mesh.indices.size() * sizeof(unsigned int), shapes[i].mesh.indices.data(), GL_STATIC_DRAW);
+	}
 
 	for (int i = 0; i < shapes.size(); i++)
 	{
 		glGenVertexArrays(1, &vao[i]);
 		glBindVertexArray(vao[i]);
-		glGenBuffers(1, &position_buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, position_buffer);
-		glBufferData(GL_ARRAY_BUFFER, shapes[i].mesh.positions.size() * sizeof(float), shapes[i].mesh.positions.data(), GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, position_buffer[i]);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer[i]);
 	}
-
-
-	/*
-	glGenBuffers(1, &normal_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, normal_buffer);
-	glBufferData(GL_ARRAY_BUFFER, shapes[0].mesh.normals.size() * sizeof(float), shapes[0].mesh.normals.data(), GL_STATIC_DRAW);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(1);
-	*/
-
-
 
 	// ----- End Initialize Input Mesh -----
 }
-
 void My_Display()
 {
 	static const GLfloat black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -158,41 +190,29 @@ void My_Display()
 	glClearBufferfv(GL_COLOR, 0, white);
 	glClearBufferfv(GL_DEPTH, 0, ones);
 	glUseProgram(render_prog);
-	glEnable(GL_DEPTH_TEST);
+	glFrontFace(GL_CW);
+	glEnable(GL_DEPTH_TEST || GL_CULL_FACE);
 
-	model_matrix = translate(mat4(), vec3(-1.0f, 0.0f, 0.0f))* scale(mat4(), vec3(Scale));
-
-	view_matrix = lookAt(vec3(1.0f, 0.9f, 0.8f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-
-	mvp_matrix = proj_matrix * view_matrix * model_matrix;
-	//vec4 testpos = mvp_matrix * vec4(shapes[0].mesh.positions[0], shapes[0].mesh.positions[1], shapes[0].mesh.positions[2],1);
-	//printf("%f %f %f \n", testpos[0], testpos[1], testpos[2]);
-
+	view_matrix = lookAt(vec3(camera.x, camera.y, camera.z), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	mvp_matrix = proj_matrix * view_matrix;
 	glUniformMatrix4fv(uniforms.render.mvp_matrix, 1, GL_FALSE, &mvp_matrix[0][0]);
 	
-	
-	glLineWidth(2.0f);
+	glLineWidth(3.0f);
+
 	for (int i = 0; i < shapes.size(); i++)
 	{
-
-		glGenBuffers(1, &index_buffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, shapes[i].mesh.indices.size() * sizeof(unsigned int), shapes[i].mesh.indices.data(), GL_STATIC_DRAW);
 		index_count = shapes[i].mesh.indices.size();
 
 		glUniform4fv(uniforms.render.color, 1, black);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glBindVertexArray(vao[i]);
 		glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
-		/*
+		
 		glUniform4fv(uniforms.render.color, 1, grey);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
 		glBindVertexArray(vao[i]);
 		glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
-		*/
 	}
-
 	// ----- End Render Pass -----
 
 	glutSwapBuffers();
@@ -202,7 +222,7 @@ void My_Reshape(int width, int height)
 {
 	glViewport(0, 0, width, height);
 	float viewportAspect = (float)width / (float)height;
-	proj_matrix = perspective(deg2rad(60.0f), viewportAspect, 0.1f, 1000.0f);
+	proj_matrix = perspective(deg2rad(60.0f), viewportAspect, 0.1f, 100000.0f);
 }
 
 void My_Timer(int val)
@@ -213,24 +233,50 @@ void My_Timer(int val)
 
 void My_Mouse(int button, int state, int x, int y)
 {
-	return;
+	switch (button)
+	{
+	case GLUT_LEFT_BUTTON:
+		if (state == GLUT_DOWN)
+		{
+			mouse.press.x = x;
+			mouse.press.y = y;
+			mouse.pressed = true;
+		}
+		else
+		{
+			mouse.release.x += mouse.diff.x;
+			mouse.release.y += mouse.diff.y;
+			mouse.diff.x = 0;
+			mouse.diff.y = 0;
+			mouse.pressed = false;
+		}
+		break;
+	}
 }
 
 void My_Wheel(int button, int dir, int x, int y)
 {
 	if (dir > 0)
 	{
-		Scale += 0.0001;
+		camera.x -= 100;
 	}
 	else
 	{
-		Scale -= 0.0001;
+		camera.x += 100;
 	}
 }
 
 void My_Motion(int x, int y)
 {
-	return;
+	mouse.position.x = x;
+	mouse.position.y = y;
+	if(mouse.pressed)
+	{
+		mouse.diff.x = x - mouse.press.x;
+		mouse.diff.y = y - mouse.press.y;
+		camera.z = 10.0f*(mouse.release.x + mouse.diff.x);
+		camera.y = 10.0f*(mouse.release.y + mouse.diff.y);
+	}
 }
 
 int main(int argc, char *argv[])
@@ -269,6 +315,8 @@ int main(int argc, char *argv[])
 	// Enter main event loop.
 	//////////////
 	glutMainLoop();
+	free(index_buffer);
+	free(position_buffer);
 	//////////////
 	return 0;
 }
