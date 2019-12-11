@@ -62,7 +62,10 @@ struct
 	bool pressed = false;
 } mouse;
 
-
+vec3 spherical2cartesian(GLfloat rho, GLfloat phi, GLfloat theta)
+{
+	return  vec3(rho*sin(phi)*cos(theta), rho*cos(phi), rho*sin(phi)*sin(theta));
+}
 
 const char *render_fs[] =
 {
@@ -248,14 +251,10 @@ void My_Display()
 	glEnable(GL_DEPTH_TEST || GL_CULL_FACE);
 
 
-	view_matrix = lookAt(vec3(	spherical.rho*sin(spherical.phi)*cos(spherical.theta), 
-								spherical.rho*cos(spherical.phi),
-								spherical.rho*sin(spherical.phi)*sin(spherical.theta)), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	view_matrix = lookAt(spherical2cartesian(spherical.rho, spherical.phi, spherical.theta), 
+						 vec3(0.0f, 0.0f, 0.0f), 
+						 vec3(0.0f, 1.0f, 0.0f));
 	
-
-	
-
-	//view_matrix = lookAt(vec3(camera.x, camera.y, camera.z), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	mvp_matrix = proj_matrix * view_matrix;
 	glUniformMatrix4fv(uniforms.render.mvp_matrix, 1, GL_FALSE, &mvp_matrix[0][0]);
 	
