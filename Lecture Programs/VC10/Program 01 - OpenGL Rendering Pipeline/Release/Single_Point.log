@@ -6,16 +6,16 @@ c:\users\gary1\documents\github\opengl\lecture programs\include\tiny_obj_loader.
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(2263): note: see declaration of 'sscanf'
 c:\users\gary1\documents\github\opengl\lecture programs\include\common.h(164): warning C4018: '<': signed/unsigned mismatch
 c:\users\gary1\documents\github\opengl\lecture programs\include\common.h(166): warning C4018: '<': signed/unsigned mismatch
-c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(165): warning C4018: '<': signed/unsigned mismatch
-c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(223): warning C4018: '<': signed/unsigned mismatch
-c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(261): warning C4018: '<': signed/unsigned mismatch
-c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(269): warning C4018: '<': signed/unsigned mismatch
-c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(346): warning C4305: '=': truncation from 'double' to 'GLfloat'
-c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(356): warning C4996: 'chdir': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _chdir. See online help for details.
+c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(170): warning C4018: '<': signed/unsigned mismatch
+c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(226): warning C4018: '<': signed/unsigned mismatch
+c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(264): warning C4018: '<': signed/unsigned mismatch
+c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(272): warning C4018: '<': signed/unsigned mismatch
+c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(349): warning C4305: '=': truncation from 'double' to 'GLfloat'
+c:\users\gary1\documents\github\opengl\lecture programs\source\single_point\single_point.cpp(359): warning C4996: 'chdir': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _chdir. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\direct.h(102): note: see declaration of 'chdir'
   Generating code
-  3 of 1827 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
-    1 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+  1 of 1827 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   Single_Point.vcxproj -> C:\Users\gary1\Documents\GitHub\openGL\Lecture Programs\VC10\Program 01 - OpenGL Rendering Pipeline\Release\Single_Point.exe

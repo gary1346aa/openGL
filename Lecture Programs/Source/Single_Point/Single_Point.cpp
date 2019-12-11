@@ -162,73 +162,65 @@ void My_Init()
 	index_buffer = (GLuint*)malloc(shapes.size() * sizeof(GLuint));
 	texcoord_buffer = (GLuint*)malloc(shapes.size() * sizeof(GLuint));
 
+	glGenBuffers(shapes.size(), position_buffer);
+	glGenBuffers(shapes.size(), index_buffer);
+	glGenBuffers(shapes.size(), texcoord_buffer);
+	glGenVertexArrays(shapes.size(), vao);
+
 	for (int i = 0; i < shapes.size(); i++) {
-		glGenBuffers(1, &position_buffer[i]);
 		glBindBuffer(GL_ARRAY_BUFFER, position_buffer[i]);
 		glBufferData(GL_ARRAY_BUFFER, shapes[i].mesh.positions.size() * sizeof(float), shapes[i].mesh.positions.data(), GL_STATIC_DRAW);
-		glGenBuffers(1, &index_buffer[i]);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer[i]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, shapes[i].mesh.indices.size() * sizeof(unsigned int), shapes[i].mesh.indices.data(), GL_STATIC_DRAW);
-		glGenBuffers(1, &texcoord_buffer[i]);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, texcoord_buffer[i]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, shapes[i].mesh.texcoords.size() * sizeof(unsigned int), shapes[i].mesh.texcoords.data(), GL_STATIC_DRAW);
 	}
 	
-	{
-		for (size_t m = 0; m < materials.size(); m++) {
-			tinyobj::material_t* mp = &materials[m];
+	for (size_t m = 0; m < materials.size(); m++) {
+		tinyobj::material_t* mp = &materials[m];
 
-			if (mp->diffuse_texname.length() > 0) {
-				// Only load the texture if it is not already loaded
-				if (textures.find(mp->diffuse_texname) == textures.end()) {
-					GLuint texture_id;
-					int w, h;
-					int comp;
+		if (mp->diffuse_texname.length() > 0) {
+			// Only load the texture if it is not already loaded
+			if (textures.find(mp->diffuse_texname) == textures.end()) {
+				GLuint texture_id;
+				int w, h;
+				int comp;
 
-					std::string texture_filename = base_dir + mp->diffuse_texname;
+				std::string texture_filename = base_dir + mp->diffuse_texname;
 
-					unsigned char* image =
-						stbi_load(texture_filename.c_str(), &w, &h, &comp, STBI_default);
-					if (!image) {
-						std::cerr << "Unable to load texture: " << texture_filename
-							<< std::endl;
-						exit(1);
-					}
-					std::cout << m << " Loaded texture: " << texture_filename << ", w = " << w
-						<< ", h = " << h << ", comp = " << comp << std::endl;
+				unsigned char* image =
+					stbi_load(texture_filename.c_str(), &w, &h, &comp, STBI_default);
 
-					glGenTextures(1, &texture_id);
-					glBindTexture(GL_TEXTURE_2D, texture_id);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-					if (comp == 3) {
-						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB,
-							GL_UNSIGNED_BYTE, image);
-					}
-					else if (comp == 4) {
-						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
-							GL_UNSIGNED_BYTE, image);
-					}
-					else {
-						assert(0);  // TODO
-					}
-					glBindTexture(GL_TEXTURE_2D, 0);
-					stbi_image_free(image);
-					textures.insert(std::make_pair(mp->diffuse_texname, texture_id));
+				cout << m << " Loaded texture: " << texture_filename << ", w = " << w
+					<< ", h = " << h << ", comp = " << comp << std::endl;
+
+				glGenTextures(1, &texture_id);
+				glBindTexture(GL_TEXTURE_2D, texture_id);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				if (comp == 3) {
+					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB,
+						GL_UNSIGNED_BYTE, image);
 				}
+				else if (comp == 4) {
+					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+						GL_UNSIGNED_BYTE, image);
+				}
+				glBindTexture(GL_TEXTURE_2D, 0);
+				stbi_image_free(image);
+				textures.insert(std::make_pair(mp->diffuse_texname, texture_id));
 			}
 		}
 	}
 
+
 	for (int i = 0; i < shapes.size(); i++)
 	{
-		glGenVertexArrays(1, &vao[i]);
 		glBindVertexArray(vao[i]);
-
-		glBindBuffer(GL_ARRAY_BUFFER, position_buffer[i]);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, position_buffer[i]);		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer[i]);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	}
 
 	// ----- End Initialize Input Mesh -----
@@ -274,12 +266,12 @@ void My_Display()
 		}
 		glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		/*
+		
 		glUniform4fv(uniforms.render.color, 1, grey);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glBindVertexArray(vao[i]);
 		glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
-		*/
+		
 	}
 	// ----- End Render Pass -----
 
