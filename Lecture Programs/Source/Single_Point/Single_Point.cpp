@@ -35,6 +35,8 @@ struct
 struct
 {
 	GLfloat height = 500.0f;
+	GLfloat fb = 0.0f;
+	GLfloat lr = 0.0f;
 	GLfloat rho = 5000;
 	GLfloat phi = deg2rad(90);
 	GLfloat theta = 0;
@@ -271,8 +273,8 @@ void My_Display()
 
 	glEnable(GL_DEPTH_TEST);
 
-	view_matrix = lookAt(spherical2cartesian(spherical.rho, spherical.phi, spherical.theta) + vec3(0.0f, spherical.height, 0.0f), 
-						 vec3(0.0f, spherical.height, 0.0f), 
+	view_matrix = lookAt(spherical2cartesian(spherical.rho, spherical.phi, spherical.theta) + vec3(spherical.fb, spherical.height, spherical.lr), 
+						 vec3(spherical.fb, spherical.height, spherical.lr),
 						 vec3(0.0f, 1.0f, 0.0f));
 	
 	mvp_matrix = proj_matrix * view_matrix;
@@ -290,12 +292,12 @@ void My_Display()
 
 		glBindVertexArray(vao[i]);
 		glActiveTexture(GL_TEXTURE0);
-		for (int j = 0; j < 1; j++)
+		for (int j = 0; j < shapes[i].mesh.material_ids.size(); j++)
 		{
 			glBindTexture(GL_TEXTURE_2D, textures[materials[shapes[i].mesh.material_ids[j]].diffuse_texname]);
 			glUniform1i(uniforms.render.s_texture, 0);
 
-			glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3*sizeof(float)*j));
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
@@ -380,10 +382,19 @@ void My_Motion(int x, int y)
 
 void My_keyboard(unsigned char key, int x, int y)
 {
-	if (key == 'w')
+	if (key == 'r')
 		spherical.height += 100;
-	else if (key == 's')
+	if (key == 'f')
 		spherical.height -= 100;
+	if (key == 'a')
+		spherical.lr += 100;
+	if (key == 'd')
+		spherical.lr -= 100;
+	if (key == 'w')
+		spherical.fb -= 100;
+	if (key == 's')
+		spherical.fb += 100;
+
 }
 
 
