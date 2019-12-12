@@ -19,6 +19,7 @@ vector<tinyobj::material_t> materials;
 GLuint *position_buffer;
 GLuint *index_buffer;
 GLuint *texcoord_buffer;
+GLuint *vbo;
 map<string, GLuint> textures;
 
 struct
@@ -27,11 +28,13 @@ struct
 	{
 		GLint color;
 		GLint mvp_matrix;
+		GLint s_texture;
 	} render;
 } uniforms;
 
 struct
 {
+	GLfloat height = 500.0f;
 	GLfloat rho = 5000;
 	GLfloat phi = deg2rad(90);
 	GLfloat theta = 0;
@@ -71,12 +74,21 @@ const char *render_fs[] =
 {
 	"#version 410 core                \n"
 	"                                 \n"
+#if 0
 	"uniform vec4 color;              \n"
+#else
+	"uniform sampler2D s_texture;     \n"
+#endif
 	"out vec4 frag_color;             \n"
+	"in vec2 v_texcoord;              \n"
 	"                                 \n"
 	"void main(void)                  \n"
 	"{                                \n"
+#if 0	
 	"    frag_color = color;          \n"
+#else
+	"    frag_color = texture(s_texture, v_texcoord); \n"
+#endif
 	"}                                \n"
 };
 
@@ -111,9 +123,12 @@ const char *render_vs[] =
 	"                                                  \n"
 	"uniform mat4 mvp_matrix;                          \n"
 	"layout (location = 0) in vec3 position;           \n"
+	"layout (location = 1) in vec2 texcoord;           \n"
+	"out vec2 v_texcoord;                              \n"
 	"                                                  \n"
 	"void main(void)                                   \n"
 	"{                                                 \n"
+	"    v_texcoord = texcoord;                        \n"
 	"    gl_Position = mvp_matrix*vec4(position, 1.0); \n"
 	"}                                                 \n"
 };
@@ -148,6 +163,7 @@ void My_Init()
 	glUseProgram(render_prog);
 	uniforms.render.mvp_matrix = glGetUniformLocation(render_prog, "mvp_matrix");
 	uniforms.render.color = glGetUniformLocation(render_prog, "color");
+	uniforms.render.s_texture = glGetUniformLocation(render_prog, "s_texture");
 	// ----- End Initialize Depth-Normal Only Program -----
 
 	// ----- Begin Initialize Input Mesh -----
@@ -172,12 +188,20 @@ void My_Init()
 		glBufferData(GL_ARRAY_BUFFER, shapes[i].mesh.positions.size() * sizeof(float), shapes[i].mesh.positions.data(), GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer[i]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, shapes[i].mesh.indices.size() * sizeof(unsigned int), shapes[i].mesh.indices.data(), GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, texcoord_buffer[i]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, shapes[i].mesh.texcoords.size() * sizeof(unsigned int), shapes[i].mesh.texcoords.data(), GL_STATIC_DRAW);
+
+		for (int j = 1; j < shapes[i].mesh.texcoords.size(); j += 2)
+			shapes[i].mesh.texcoords[j] = 1 - shapes[i].mesh.texcoords[j];
+
+		cout << i << " material size: " << shapes[i].mesh.material_ids.size() << endl;
+
+		glBindBuffer(GL_ARRAY_BUFFER, texcoord_buffer[i]);
+		glBufferData(GL_ARRAY_BUFFER, shapes[i].mesh.texcoords.size() * sizeof(unsigned int), shapes[i].mesh.texcoords.data(), GL_STATIC_DRAW);
 	}
 	
 	for (size_t m = 0; m < materials.size(); m++) {
 		tinyobj::material_t* mp = &materials[m];
+
+		cout << mp->diffuse_texname << endl;
 
 		if (mp->diffuse_texname.length() > 0) {
 			// Only load the texture if it is not already loaded
@@ -213,14 +237,21 @@ void My_Init()
 		}
 	}
 
-
 	for (int i = 0; i < shapes.size(); i++)
 	{
 		glBindVertexArray(vao[i]);
+	
 		glBindBuffer(GL_ARRAY_BUFFER, position_buffer[i]);		
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer[i]);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3* sizeof(float), 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, texcoord_buffer[i]);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+
+
 	}
 
 	// ----- End Initialize Input Mesh -----
@@ -237,14 +268,11 @@ void My_Display()
 	glClearBufferfv(GL_COLOR, 0, white);
 	glClearBufferfv(GL_DEPTH, 0, ones);
 	glUseProgram(render_prog);
-	glActiveTexture(GL_TEXTURE0);
 
-	glFrontFace(GL_CW);
-	glEnable(GL_DEPTH_TEST || GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 
-
-	view_matrix = lookAt(spherical2cartesian(spherical.rho, spherical.phi, spherical.theta), 
-						 vec3(0.0f, 0.0f, 0.0f), 
+	view_matrix = lookAt(spherical2cartesian(spherical.rho, spherical.phi, spherical.theta) + vec3(0.0f, spherical.height, 0.0f), 
+						 vec3(0.0f, spherical.height, 0.0f), 
 						 vec3(0.0f, 1.0f, 0.0f));
 	
 	mvp_matrix = proj_matrix * view_matrix;
@@ -256,22 +284,28 @@ void My_Display()
 	{
 		index_count = shapes[i].mesh.indices.size();
 
-		glUniform4fv(uniforms.render.color, 1, black);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		//glUniform4fv(uniforms.render.color, 1, black);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//glBindTexture(GL_TEXTURE_2D, 0);
+
 		glBindVertexArray(vao[i]);
-		for (int j = 0; j < shapes[i].mesh.material_ids.size(); j++)
+		glActiveTexture(GL_TEXTURE0);
+		for (int j = 0; j < 1; j++)
 		{
 			glBindTexture(GL_TEXTURE_2D, textures[materials[shapes[i].mesh.material_ids[j]].diffuse_texname]);
+			glUniform1i(uniforms.render.s_texture, 0);
+
+			glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
+			glBindTexture(GL_TEXTURE_2D, 0);
 		}
-		glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		
+
+
+		/*
 		glUniform4fv(uniforms.render.color, 1, grey);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glBindVertexArray(vao[i]);
 		glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
-		
+		*/
 	}
 	// ----- End Render Pass -----
 
@@ -344,6 +378,15 @@ void My_Motion(int x, int y)
 	}
 }
 
+void My_keyboard(unsigned char key, int x, int y)
+{
+	if (key == 'w')
+		spherical.height += 100;
+	else if (key == 's')
+		spherical.height -= 100;
+}
+
+
 int main(int argc, char *argv[])
 {
 	// Change working directory to source code path
@@ -374,6 +417,7 @@ int main(int argc, char *argv[])
 	glutMouseWheelFunc(My_Wheel);
 	glutMotionFunc(My_Motion);
 	glutPassiveMotionFunc(My_Motion);
+	glutKeyboardFunc(My_keyboard);
 	glutTimerFunc(16, My_Timer, 0);
 	///////////////////////////////
 
