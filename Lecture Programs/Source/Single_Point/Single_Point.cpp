@@ -185,6 +185,7 @@ void My_Init()
 	glGenBuffers(shapes.size(), texcoord_buffer);
 	glGenVertexArrays(shapes.size(), vao);
 
+
 	for (int i = 0; i < shapes.size(); i++) {
 		glBindBuffer(GL_ARRAY_BUFFER, position_buffer[i]);
 		glBufferData(GL_ARRAY_BUFFER, shapes[i].mesh.positions.size() * sizeof(float), shapes[i].mesh.positions.data(), GL_STATIC_DRAW);
@@ -194,7 +195,7 @@ void My_Init()
 		for (int j = 1; j < shapes[i].mesh.texcoords.size(); j += 2)
 			shapes[i].mesh.texcoords[j] = 1 - shapes[i].mesh.texcoords[j];
 
-		cout << i << " material size: " << shapes[i].mesh.material_ids.size() << endl;
+		//cout << i << " material size: " << shapes[i].mesh.material_ids.size() << endl;
 
 		glBindBuffer(GL_ARRAY_BUFFER, texcoord_buffer[i]);
 		glBufferData(GL_ARRAY_BUFFER, shapes[i].mesh.texcoords.size() * sizeof(unsigned int), shapes[i].mesh.texcoords.data(), GL_STATIC_DRAW);
@@ -292,6 +293,8 @@ void My_Display()
 
 		glBindVertexArray(vao[i]);
 		glActiveTexture(GL_TEXTURE0);
+
+#if 0
 		for (int j = 0; j < shapes[i].mesh.material_ids.size(); j++)
 		{
 			glBindTexture(GL_TEXTURE_2D, textures[materials[shapes[i].mesh.material_ids[j]].diffuse_texname]);
@@ -300,7 +303,13 @@ void My_Display()
 			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3*sizeof(float)*j));
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
+#else
+		glBindTexture(GL_TEXTURE_2D, textures[materials[shapes[i].mesh.material_ids[0]].diffuse_texname]);
+		glUniform1i(uniforms.render.s_texture, 0);
 
+		glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+#endif
 
 		/*
 		glUniform4fv(uniforms.render.color, 1, grey);
