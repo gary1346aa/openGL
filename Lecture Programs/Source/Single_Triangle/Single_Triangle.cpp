@@ -273,95 +273,6 @@ void My_Display()
 	glutSwapBuffers();
 }
 
-/*
-void My_RayCasting() 
-{
-	if (draw_faceidx == nullptr)
-		draw_faceidx = (int*)malloc(999 * sizeof(int));
-	vector<pair<double, int>> hit;
-	for (int i = 0; i < bunny->faceCount; ++i)
-	{
-
-		vec4 a = mvp_matrix * vec4(	(float)bunny->vertex[3 * bunny->face[3*i  ]  ], 
-									(float)bunny->vertex[3 * bunny->face[3*i  ]+1],
-									(float)bunny->vertex[3 * bunny->face[3*i  ]+2], 1.0f );
-
-		vec4 b = mvp_matrix * vec4(	(float)bunny->vertex[3 * bunny->face[3*i+1]  ],
-									(float)bunny->vertex[3 * bunny->face[3*i+1]+1],
-									(float)bunny->vertex[3 * bunny->face[3*i+1]+2], 1.0f );
-
-		vec4 c = mvp_matrix * vec4(	(float)bunny->vertex[3 * bunny->face[3*i+2]  ], 
-									(float)bunny->vertex[3 * bunny->face[3*i+2]+1],
-									(float)bunny->vertex[3 * bunny->face[3*i+2]+2], 1.0f );
-
-		//float mx = (mousePos.px * 2.0f / (float)viewportSize.width) - 1;
-		//float my = 1 - (mousePos.py * 2.0f / (float)viewportSize.height);
-
-		if (a.w == 0 || b.w == 0 || c.w == 0)
-			continue;
-
-		a /= a.w;
-		b /= b.w;
-		c /= c.w;
-
-		//printf("m: %f %f\n", mx, my);
-		//printf("a: %f %f\n", a[0], a[1]);
-		//printf("b: %f %f\n", b[0], b[1]);
-		//printf("c: %f %f\n", c[0], c[1]);
-
-		//printf("a : %f %f\n", (a[0] + 1) * viewportSize.width / 2.0f, (1 - a[1]) * viewportSize.height / 2.0f);
-		//printf("b : %f %f\n", (b[0] + 1) * viewportSize.width / 2.0f, (1 - b[1]) * viewportSize.height / 2.0f);
-		//printf("c : %f %f\n", (c[0] + 1) * viewportSize.width / 2.0f, (1 - c[1]) * viewportSize.height / 2.0f);
-
-		vec2 a2 = { (a.x + 1) * viewportSize.width / 2.0f, (1 - a.y) * viewportSize.height / 2.0f };
-		vec2 b2 = { (b.x + 1) * viewportSize.width / 2.0f, (1 - b.y) * viewportSize.height / 2.0f };
-		vec2 c2 = { (c.x + 1) * viewportSize.width / 2.0f, (1 - c.y) * viewportSize.height / 2.0f };
-		vec2 p2 = { float(mousePos.px), float(mousePos.py) };
-
-		vec2 v0 = c2 - a2;
-		vec2 v1 = b2 - a2;
-		vec2 v2 = p2 - a2;
-		
-		float dot00 = dot(v0, v0);
-		float dot01 = dot(v0, v1);
-		float dot02 = dot(v0, v2);
-		float dot11 = dot(v1, v1);
-		float dot12 = dot(v1, v2);
-
-		float det = (dot00 * dot11 - dot01 * dot01);
-		if (det < 1e-6 && det > -1e-6)
-			continue;
-		
-		//printf("a: %f %f\n", a2[0], a2[1]);
-		//printf("b: %f %f\n", b2[0], b2[1]);
-		//printf("c: %f %f\n", c2[0], c2[1]);
-
-		// printf("dot: u : %f \n", dot(v1, v2)/(v1[0]*v1[0] + v1[1]*v1[1]));
-
-		double invDenom = 1.0f / det;
-		double u = (dot11 * dot02 - dot01 * dot12) * invDenom;
-		double v = (dot00 * dot12 - dot01 * dot02) * invDenom;
-
-		// printf("barycentric u : %f, v = %f\n", u, v);
-
-		if ((u >= 0) && (v >= 0) && (u + v < 1))
-		{
-			hit.push_back({ a[2] + u * (b[2] - a[2]) + v * (c[2] - a[2]), i });
-			printf("hit! %d\n", i);
-		}
-	}
-	if (hit.size())
-	{
-		sort(hit.begin(), hit.end());
-		printf("hit face id: %d\n", hit[0].second);
-		draw_faceidx[3*draw_count  ] = bunny->face[3 * hit[0].second    ];
-		draw_faceidx[3*draw_count+1] = bunny->face[3 * hit[0].second + 1];
-		draw_faceidx[3*draw_count+2] = bunny->face[3 * hit[0].second + 2];
-		draw_count++;
-	}
-
-}*/
-
 void My_Reshape(int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -385,8 +296,6 @@ void My_Mouse(int button, int state, int x, int y)
 		{
 			mousePos.px = x;
 			mousePos.py = y;
-			printf("Mouse Pressed: x = %d, y = %d\n", x, y);
-			//My_RayCasting();
 		}
 		break;
 	case GLUT_LEFT_BUTTON:
@@ -394,7 +303,6 @@ void My_Mouse(int button, int state, int x, int y)
 		{
 			mousePos.px = x;
 			mousePos.py = y;
-			printf("Mouse Pressed: x = %d, y = %d\n", x, y);
 			rot = true;
 		}
 		else
@@ -404,7 +312,6 @@ void My_Mouse(int button, int state, int x, int y)
 			mousePos.dx = 0;
 			mousePos.dy = 0;
 			rot = false;
-			printf("Mouse Released\n");
 		}
 		break;
 	}
@@ -419,7 +326,6 @@ void My_Motion(int x, int y)
 		mousePos.dx = x - mousePos.px;
 		mousePos.dy = y - mousePos.py; 
 	}
-	//printf("Mouse Position: x = %d, y = %d\n", x, y);
 }
 
 int main(int argc, char *argv[])

@@ -223,8 +223,7 @@ void My_Init()
 
 				glGenTextures(1, &texture_id);
 				glBindTexture(GL_TEXTURE_2D, texture_id);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
 				if (comp == 3) {
 					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB,
 						GL_UNSIGNED_BYTE, image);
@@ -233,6 +232,10 @@ void My_Init()
 					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
 						GL_UNSIGNED_BYTE, image);
 				}
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glGenerateMipmap(GL_TEXTURE_2D);
+
 				glBindTexture(GL_TEXTURE_2D, 0);
 				stbi_image_free(image);
 				textures.insert(std::make_pair(mp->diffuse_texname, texture_id));
@@ -282,6 +285,8 @@ void My_Display()
 	glUniformMatrix4fv(uniforms.render.mvp_matrix, 1, GL_FALSE, &mvp_matrix[0][0]);
 	
 	glLineWidth(1.5f);
+
+	//cout << shapes.size() << endl;
 
 	for (int i = 0; i < shapes.size(); i++)
 	{
