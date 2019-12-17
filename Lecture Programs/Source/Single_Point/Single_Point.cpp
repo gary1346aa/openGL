@@ -11,7 +11,6 @@ mat4 proj_matrix;
 mat4 view_matrix;
 mat4 mvp_matrix;
 
-
 static const GLfloat black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 static const GLfloat grey[] = { 0.5f, 0.5f, 0.5f, 1.0f };
 static const GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -84,36 +83,6 @@ vec3 spherical2cartesian(GLfloat rho, GLfloat phi, GLfloat theta)
 	return  vec3(rho*sin(phi)*cos(theta), rho*cos(phi), rho*sin(phi)*sin(theta));
 }
 
-const char *render_fs[] =
-{
-	"#version 410 core                \n"
-	"                                 \n"
-	"uniform sampler2D s_texture;     \n"
-	"out vec4 frag_color;             \n"
-	"in vec2 v_texcoord;              \n"
-	"                                 \n"
-	"void main(void)                  \n"
-	"{                                \n"
-	"    frag_color = texture(s_texture, v_texcoord); \n"
-	"}                                \n"
-};
-
-const char *render_vs[] =
-{
-	"#version 410 core                                 \n"
-	"                                                  \n"
-	"uniform mat4 mvp_matrix;                          \n"
-	"layout (location = 0) in vec3 position;           \n"
-	"layout (location = 1) in vec2 texcoord;           \n"
-	"out vec2 v_texcoord;                              \n"
-	"                                                  \n"
-	"void main(void)                                   \n"
-	"{                                                 \n"
-	"    v_texcoord = texcoord;                        \n"
-	"    gl_Position = mvp_matrix*vec4(position, 1.0); \n"
-	"}                                                 \n"
-};
-
 void My_Init()
 {
 	glEnable(GL_DEPTH_TEST);
@@ -124,8 +93,17 @@ void My_Init()
 	vs = glCreateShader(GL_VERTEX_SHADER);
 	fs = glCreateShader(GL_FRAGMENT_SHADER);
 
-	glShaderSource(vs, 1, render_vs, NULL);
-	glShaderSource(fs, 1, render_fs, NULL);
+	string vs_script = 
+		#include "shader.v"
+		;
+	string fs_script =
+		#include "shader.f"
+		;
+
+	const char* vs_scriptc = vs_script.c_str();
+	const char* fs_scriptc = fs_script.c_str();
+	glShaderSource(vs, 1, &vs_scriptc, NULL);
+	glShaderSource(fs, 1, &fs_scriptc, NULL);
 	glCompileShader(vs);
 	glCompileShader(fs);
 	printGLShaderLog(vs);
