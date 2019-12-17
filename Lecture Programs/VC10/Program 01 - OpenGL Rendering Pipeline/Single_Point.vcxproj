@@ -81,6 +81,12 @@
   <ItemGroup>
     <ClCompile Include="..\..\Source\Single_Point\Single_Point.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shader.f" />
+    <None Include="shader.v">
+      <FileType>Discomap</FileType>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
